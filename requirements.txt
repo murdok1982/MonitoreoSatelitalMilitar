@@ -1,0 +1,8 @@
+streamlit
+folium
+streamlit-folium
+sentinelhub
+ultralytics
+opencv-python
+sqlite3
+numpy
