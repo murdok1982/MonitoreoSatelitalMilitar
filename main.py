@@ -1,3 +1,4 @@
+from config import INSTANCE_ID, CLIENT_ID, CLIENT_SECRET, EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO, YOLO_MODEL_PATH, UPDATE_INTERVAL, SENSIBILIDAD_ALERTA
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
