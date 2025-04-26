@@ -9,5 +9,7 @@ Proyecto en Python para detección y monitoreo de vehículos militares vía imá
 - Configuración de cuenta de correo para alertas
 
 ## Instalación
-```bash
+git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
+Entrar en directorio para instalar los requerimientos
 pip install -r requirements.txt
+streamlit run main.py
