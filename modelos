@@ -1,3 +1,10 @@
 yolov8_military.pt
 
-Debeis sustituir esta directorio por el modelo entrenado,tiene mucho coste de tiempo y computacional por eso no lo pongo
+Debeis sustituir esta directorio por el modelo entrenado,tiene mucho coste de tiempo y computacional por eso no lo pongo.
+
+puedes descargar las imagenes desde estos sitios:
+
+xView | Vehículos, aviones, barcos, etc. Incluye conflictos. | xView Dataset
+DOTA | Detección de objetos en imágenes aéreas, incluye helicópteros, tanques. | DOTA Dataset
+SpaceNet | Imágenes urbanas satelitales. Poca cosa militar, pero buena para terrenos. | SpaceNet
+xView2 | Cambios en imágenes antes y después de desastres (útil para cambios rápidos). | xView2
