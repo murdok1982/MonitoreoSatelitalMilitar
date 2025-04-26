@@ -11,20 +11,8 @@ import os
 import cv2
 import numpy as np
 
-# --- Configuraciones generales ---
-UPDATE_INTERVAL = 3600  # cada 1 hora
-SENSIBILIDAD_ALERTA = 10  # vehículos detectados
+
 DB_NAME = 'detecciones.db'
-
-# --- Setup Sentinel Hub ---
-config = SHConfig()
-config.instance_id = 'Tu instancia'
-config.sh_client_id = 'Tu identificador'
-config.sh_client_secret = 'contraseña'
-
-# --- Cargar modelo YOLO entrenado ---
-model = YOLO('ruta_a_tu_modelo_entrenado.pt')
-
 # --- Crear/Conectar a la base de datos ---
 conn = sqlite3.connect(DB_NAME)
 c = conn.cursor()
