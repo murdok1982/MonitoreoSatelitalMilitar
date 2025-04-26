@@ -4,7 +4,13 @@ Debeis sustituir esta directorio por el modelo entrenado,tiene mucho coste de ti
 
 puedes descargar las imagenes desde estos sitios:
 
-xView | Vehículos, aviones, barcos, etc. Incluye conflictos. | xView Dataset
-DOTA | Detección de objetos en imágenes aéreas, incluye helicópteros, tanques. | DOTA Dataset
-SpaceNet | Imágenes urbanas satelitales. Poca cosa militar, pero buena para terrenos. | SpaceNet
-xView2 | Cambios en imágenes antes y después de desastres (útil para cambios rápidos). | xView2
+Fuentes de Datasets Militares o Satelitales
+xView	Imágenes satelitales anotadas: vehículos, aviones, barcos, etc. (incluye militares)	xView Dataset
+DOTA	Imágenes aéreas con muchos tipos de vehículos: helicópteros, barcos, camiones	DOTA Dataset
+xView2	Imágenes de cambios después de desastres, útil para detectar movimientos y daños	xView2 Dataset
+SpaceNet	Conjuntos de datos urbanos, satelitales, alta calidad (carreteras, edificios)	SpaceNet
+Vehicle Detection in Aerial Imagery (VEDAI)	3000 imágenes aéreas de vehículos de distintos tipos	VEDAI Dataset
+Onera Satellite Change Detection (OSCD)	Imágenes de antes/después de áreas (útil para vigilar bases militares)	OSCD Dataset
+Military Aircraft Dataset	Aviones militares vistos desde arriba (aéreo)	Military Aircraft Dataset
+Airbus Ship Dataset	Detección de barcos en el océano, útil para bases navales	Airbus Ship Detection Challenge
+Google Open Buildings Dataset	Detectar estructuras militares en zonas remotas	Google Open Buildings
