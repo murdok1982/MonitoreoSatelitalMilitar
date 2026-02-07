@@ -18,15 +18,43 @@
 - 💾 **Database Integration**: Store and query historical data
 - 📸 **Image Processing**: Advanced computer vision for object detection
 
+## 💰 Support This Project
+
+<div align="center">
+
+### ₿ Bitcoin Donations Welcome!
+
+<img src="https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white" alt="Bitcoin"/>
+
+```
+┌─────────────────────────────────────┐
+│    ₿  BTC Donation Address  ₿      │
+├─────────────────────────────────────┤
+│                                     │
+│  bc1qqphwht25vjzlptwzjyjt3sex     │
+│  7e3p8twn390fkw                    │
+│                                     │
+│  Network: Bitcoin (BTC)             │
+│  Scan QR ↓                          │
+└─────────────────────────────────────┘
+```
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bitcoin:bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw" alt="Bitcoin QR Code" width="200"/>
+
+**Address:** `bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw`
+
+*Your donations help maintain this defense technology project!* 🙏
+
+</div>
+
+---
+
 ## 📋 Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Detection Capabilities](#detection-capabilities)
-- [API Reference](#api-reference)
-- [Database Schema](#database-schema)
 - [Security](#security)
 - [License](#license)
 
@@ -54,35 +82,35 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Configure API keys
-cp config.py.example config.py
-# Edit config.py with your credentials
+# Configure environment
+cp .env.example .env
+# Edit .env with your credentials
 ```
 
 ## ⚙️ Configuration
 
-### config.py
+### .env file
 
-```python
+```env
 # OpenAI Configuration
-OPENAI_API_KEY = "your_openai_api_key"
-GPT_MODEL = "gpt-4-vision-preview"
+OPENAI_API_KEY=your_openai_api_key
+GPT_MODEL=gpt-4-vision-preview
 
 # Satellite Data Sources
-SATELLITE_API_KEY = "your_satellite_api_key"
-SATELLITE_PROVIDER = "sentinel"  # or "planet", "maxar"
+SATELLITE_API_KEY=your_satellite_api_key
+SATELLITE_PROVIDER=sentinel  # or "planet", "maxar"
 
 # Detection Settings
-CONFIDENCE_THRESHOLD = 0.75
-MIN_VEHICLE_SIZE = 50  # pixels
-MAX_IMAGE_AGE = 24  # hours
+CONFIDENCE_THRESHOLD=0.75
+MIN_VEHICLE_SIZE=50  # pixels
+MAX_IMAGE_AGE=24  # hours
 
 # Alert Settings
-ALERT_WEBHOOK = "your_webhook_url"
-ALERT_THRESHOLD = "medium"  # low, medium, high, critical
+ALERT_WEBHOOK=your_webhook_url
+ALERT_THRESHOLD=medium  # low, medium, high, critical
 
 # Database
-DATABASE_URL = "sqlite:///base_de_datos/military_monitoring.db"
+DATABASE_URL=sqlite:///base_de_datos/military_monitoring.db
 ```
 
 ## 💻 Usage
@@ -114,30 +142,6 @@ for detection in detections:
     threat_level = analyzer.assess_threat(detection)
     if threat_level >= "medium":
         monitor.send_alert(detection, threat_level)
-
-# Query historical data
-results = monitor.query_area(
-    lat=40.7128,
-    lon=-74.0060,
-    radius_km=10,
-    time_range="7d"
-)
-```
-
-### Command Line Options
-
-```bash
-# Monitor specific region
-python main.py --region "40.7128,-74.0060" --radius 50
-
-# Process specific image
-python main.py --image path/to/image.jpg
-
-# Historical analysis
-python main.py --analyze --start 2024-01-01 --end 2024-12-31
-
-# Real-time monitoring
-python main.py --realtime --interval 3600
 ```
 
 ## 🎯 Detection Capabilities
@@ -153,20 +157,6 @@ python main.py --realtime --interval 3600
 | **Naval** | Destroyers, Carriers, Subs | 90% |
 | **Missiles** | SAM sites, Launchers | 87% |
 
-### Detection Features
-
-```python
-class VehicleDetection:
-    vehicle_type: str       # Tank, APC, Artillery, etc.
-    confidence: float       # 0.0 to 1.0
-    location: tuple        # (lat, lon)
-    dimensions: tuple      # (length, width) in meters
-    heading: float         # Direction in degrees
-    timestamp: datetime    # Detection time
-    image_quality: str     # low, medium, high
-    threat_level: str      # low, medium, high, critical
-```
-
 ## 🧠 AI Analysis
 
 ### GPT Vision Integration
@@ -177,34 +167,6 @@ The system uses GPT-4 Vision to:
 2. **Context Analysis**: Understand deployment patterns
 3. **Threat Assessment**: Evaluate strategic implications
 4. **Report Generation**: Create human-readable intelligence reports
-
-### Example Analysis Output
-
-```json
-{
-  "detection_id": "DET-2026-02-07-001",
-  "timestamp": "2026-02-07T14:30:00Z",
-  "location": {"lat": 52.5200, "lon": 13.4050},
-  "vehicles_detected": [
-    {
-      "type": "Main Battle Tank",
-      "model": "T-90M",
-      "confidence": 0.94,
-      "count": 12,
-      "formation": "column"
-    }
-  ],
-  "threat_assessment": {
-    "level": "high",
-    "reasoning": "Unusual concentration of armor in border region",
-    "recommended_actions": [
-      "Increase surveillance frequency",
-      "Alert nearby units",
-      "Monitor for additional movements"
-    ]
-  }
-}
-```
 
 ## 💾 Database Schema
 
@@ -220,30 +182,6 @@ CREATE TABLE detections (
     image_path VARCHAR(255),
     analyst_notes TEXT
 );
-
-CREATE TABLE alerts (
-    id INTEGER PRIMARY KEY,
-    detection_id INTEGER,
-    alert_time DATETIME,
-    severity VARCHAR(20),
-    status VARCHAR(20),
-    FOREIGN KEY (detection_id) REFERENCES detections(id)
-);
-```
-
-## 📊 Performance Metrics
-
-```python
-# System performance stats
-Performance Metrics:
-===================
-Images Processed: 1,234
-Vehicles Detected: 5,678
-True Positives: 5,234 (92.2%)
-False Positives: 444 (7.8%)
-Average Processing Time: 2.3s per image
-Alert Response Time: < 1 minute
-Database Queries: < 100ms
 ```
 
 ## 🔒 Security & Compliance
@@ -271,46 +209,6 @@ Database Queries: < 100ms
 - Targeting civilian populations
 - Commercial espionage
 
-## 🛠️ API Reference
-
-### SatelliteMonitor Class
-
-```python
-class SatelliteMonitor:
-    def __init__(config_path: str)
-    def process_image(image_path: str) -> List[Detection]
-    def query_area(lat: float, lon: float, radius_km: float) -> List[Detection]
-    def send_alert(detection: Detection, level: str) -> bool
-    def generate_report(start_date: str, end_date: str) -> Report
-```
-
-### VehicleDetector Class
-
-```python
-class VehicleDetector:
-    def __init__(model_path: str)
-    def detect(image: np.ndarray) -> List[Detection]
-    def classify(detection: Detection) -> str
-    def track(detections: List[Detection]) -> List[Track]
-```
-
-## 📚 Documentation
-
-### Project Structure
-
-```
-MonitoreoSatelitalMilitar/
-├── main.py              # Main application
-├── config.py            # Configuration
-├── modelos/             # ML models
-│   ├── vehicle_detector.h5
-│   └── threat_classifier.h5
-├── imagenes/            # Image storage
-├── base_de_datos/       # Database files
-├── requirements.txt     # Dependencies
-└── README.md           # This file
-```
-
 ## ⚠️ Legal Disclaimer
 
 **IMPORTANT LEGAL NOTICE:**
@@ -327,12 +225,6 @@ This software is intended for:
 - Respect privacy and human rights
 - Follow Rules of Engagement (ROE)
 - Maintain operational security
-
-Unauthorized use may violate:
-- International humanitarian law
-- Privacy regulations (GDPR, etc.)
-- National security laws
-- Export control regulations
 
 ## 🤝 Contributing
 
@@ -355,6 +247,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - GitHub: [@murdok1982](https://github.com/murdok1982)
 - LinkedIn: [Gustavo Lobato Clara](https://www.linkedin.com/in/gustavo-lobato-clara-2b446b102/)
+- Email: gustavolobatoclara@gmail.com
 
 ## 🙏 Acknowledgments
 
