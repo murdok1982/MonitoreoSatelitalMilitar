@@ -1,0 +1,62 @@
+# Environment
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+dist/
+*.egg-info/
+venv/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Data & Images
+imagenes/
+base_de_datos/
+*.db
+*.sqlite
+*.jpg
+*.png
+*.tif
+*.tiff
+satellite_data/
+detection_results/
+
+# ML Models
+modelos/*.h5
+modelos/*.pt
+modelos/*.pth
+modelos/*.onnx
+checkpoints/
+
+# Secrets
+config.ini
+secrets.json
+*.pem
+*.key
+api_keys.txt
+
+# Reports
+reports/
+*.pdf
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
