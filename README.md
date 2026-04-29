@@ -14,7 +14,7 @@
 
 <br/>
 
-![Military Header](https://images.unsplash.com/photo-1510006851064-e6056cd0e3a8?q=80&w=1200&auto=format&fit=crop)
+![Military Header](https://upload.wikimedia.org/wikipedia/commons/e/e8/Defense_Support_Program_Satellite.jpg)
 
 </div>
 
@@ -34,24 +34,27 @@
 ## 🧠 Mapa Conceptual del Sistema
 
 ```mermaid
-mindmap
-  root((AEGIS-IMINT))
-    Adquisición de Datos
-      Sentinel Hub
-      Multiespectral B04, B03, B02
-      Coordenadas WGS84
-    Motor de IA
-      YOLOv8 Custom
-      Ollama LLM local
-      Visión por Computadora
-    Interfaz de Mando
-      Streamlit Dashboard
-      Folium Maps
-      Dibujo de Zonas Tácticas
-    Respuesta y Alerta
-      SMTP Notificaciones
-      Umbral de Sensibilidad
-      Registro en SQLite (Cifrado)
+graph LR
+    A((AEGIS-IMINT))
+    A --> B[Adquisición de Datos]
+    B --> B1(Sentinel Hub)
+    B --> B2(Imágenes Multiespectrales)
+    B --> B3(Coordenadas WGS84)
+
+    A --> C[Motor de IA]
+    C --> C1(YOLOv8 Custom)
+    C --> C2(Ollama LLM)
+    C --> C3(Visión por Computadora)
+
+    A --> D[Interfaz de Mando]
+    D --> D1(Streamlit Dashboard)
+    D --> D2(Folium Maps)
+    D --> D3(Zonas Tácticas)
+
+    A --> E[Respuesta y Alerta]
+    E --> E1(Notificaciones SMTP)
+    E --> E2(Umbral de Sensibilidad)
+    E --> E3(SQLite Cifrado)
 ```
 
 ---
@@ -60,16 +63,16 @@ mindmap
 
 ```mermaid
 graph TD
-    A[Operador / Mando Central] -->|Define Zona de Interés| B(Interfaz Web Streamlit / Node.js)
+    A[Operador] -->|Define Zona| B(Interfaz Web)
     B -->|Coordenadas| C{Backend Python}
-    C -->|API Request| D[Sentinel Hub API]
-    D -->|Imágenes Satelitales PNG| C
-    C -->|Inferencia| E[Modelo YOLOv8 / Ollama]
-    E -->|Detecciones & Coordenadas| C
+    C -->|API Request| D[Sentinel Hub]
+    D -->|Imágenes Satelitales| C
+    C -->|Inferencia| E[Modelo YOLOv8]
+    E -->|Detecciones| C
     C -->|Almacenamiento| F[(SQLite DB Cifrada)]
-    C -->|Evaluación de Umbral| G{¿Amenaza Detectada?}
+    C -->|Evaluación| G{¿Amenaza Detectada?}
     G -->|Sí| H[Servidor SMTP]
-    H -->|Email de Alerta| I[Comandancia / Oficiales]
+    H -->|Email de Alerta| I[Comandancia]
     G -->|No| B
 ```
 
@@ -80,26 +83,26 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant O as Operador
-    participant UI as Interfaz (Streamlit)
+    participant UI as Interfaz Web
     participant Core as AEGIS Backend
     participant SH as Sentinel Hub
-    participant AI as YOLO / Ollama
+    participant AI as Motor IA
     participant DB as SQLite
     participant Mail as Servidor Correo
 
-    O->>UI: Dibuja Polígono de Vigilancia
-    UI->>Core: Inicia Monitoreo Continuo
+    O->>UI: Dibuja Polígono
+    UI->>Core: Inicia Monitoreo
     loop Intervalo de Actualización
-        Core->>SH: Solicita Imágenes (BBox)
-        SH-->>Core: Retorna Imágenes Satelitales
-        Core->>AI: Procesa Imagen (Detectar Vehículos)
+        Core->>SH: Solicita Imágenes
+        SH-->>Core: Retorna Imágenes
+        Core->>AI: Detecta Vehículos
         AI-->>Core: Conteo y Tipología
-        Core->>DB: Guarda Registro (Timestamp, Cantidad, Path)
-        alt Cantidad >= Umbral Crítico
-            Core->>Mail: Dispara Alerta Militar
-            Mail-->>O: Notificación Urgente Recibida
+        Core->>DB: Guarda Registro
+        alt Amenaza Detectada
+            Core->>Mail: Dispara Alerta
+            Mail-->>O: Notificación Urgente
         end
-        Core->>UI: Actualiza Mapa y Gráficos
+        Core->>UI: Actualiza Mapa
     end
 ```
 
