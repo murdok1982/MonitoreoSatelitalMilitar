@@ -1,32 +1,150 @@
-# 📡 MonitoreoSatelitalMilitar - Military Satellite Monitoring System
+<div align="center">
+
+# 🦅 AEGIS-IMINT: Monitoreo Satelital Militar
+### *Inteligencia Estratégica y Seguridad de Vanguardia*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![AI Powered](https://img.shields.io/badge/AI-Powered-purple.svg)](https://openai.com/)
-[![Computer Vision](https://img.shields.io/badge/CV-Enabled-green.svg)](https://opencv.org/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![AI Powered](https://img.shields.io/badge/AI-YOLOv8-purple.svg)](https://github.com/ultralytics/ultralytics)
+[![Computer Vision](https://img.shields.io/badge/CV-Sentinel_Hub-green.svg)](https://www.sentinel-hub.com/)
+[![Status: Active](https://img.shields.io/badge/Status-Active-success.svg)](#)
 
-> Advanced AI-powered satellite imagery analysis system for military vehicle detection, threat assessment, and early warning. Uses computer vision and machine learning to identify and track military assets from satellite imagery.
+> **"Vigilancia incesante, respuesta inmediata."**
+> Sistema avanzado de análisis de imágenes satelitales impulsado por Inteligencia Artificial para la detección de vehículos militares, evaluación de amenazas y alerta temprana. Utiliza visión por computadora y aprendizaje automático para identificar y rastrear activos militares.
 
-## ✨ Features
+<br/>
 
-- 📡 **Satellite Image Analysis**: Process and analyze satellite imagery in real-time
-- 🚑 **Vehicle Detection**: Identify military vehicles, tanks, aircraft, and naval vessels
-- 🤖 **AI Classification**: GPT-powered threat assessment and classification
-- 📍 **Geolocation Tracking**: Track movement patterns and deployment locations
-- ⚠️ **Early Warning System**: Automated alerts for suspicious activities
-- 📊 **Pattern Recognition**: Detect military buildups and unusual movements
-- 💾 **Database Integration**: Store and query historical data
-- 📸 **Image Processing**: Advanced computer vision for object detection
+![Military Header](https://images.unsplash.com/photo-1510006851064-e6056cd0e3a8?q=80&w=1200&auto=format&fit=crop)
 
-## 💰 Support This Project
+</div>
+
+---
+
+## 🪖 Características Principales
+
+- 📡 **Análisis de Imágenes Satelitales**: Procesamiento en tiempo real (Sentinel-2 L1C).
+- 🎯 **Detección Táctica**: Identificación de vehículos militares mediante redes neuronales (YOLOv8).
+- 🗺️ **Rastreo Geoespacial**: Visualización en mapas interactivos (Folium/Streamlit).
+- 🚨 **Sistema de Alerta Temprana**: Notificaciones automatizadas vía SMTP en caso de incursiones.
+- 💾 **Registro Histórico**: Almacenamiento seguro en SQLite para análisis forense y reconocimiento de patrones.
+- 🔐 **Arquitectura Segura**: Cifrado de base de datos y comunicaciones.
+
+---
+
+## 🧠 Mapa Conceptual del Sistema
+
+```mermaid
+mindmap
+  root((AEGIS-IMINT))
+    Adquisición de Datos
+      Sentinel Hub
+      Multiespectral B04, B03, B02
+      Coordenadas WGS84
+    Motor de IA
+      YOLOv8 Custom
+      Ollama LLM local
+      Visión por Computadora
+    Interfaz de Mando
+      Streamlit Dashboard
+      Folium Maps
+      Dibujo de Zonas Tácticas
+    Respuesta y Alerta
+      SMTP Notificaciones
+      Umbral de Sensibilidad
+      Registro en SQLite (Cifrado)
+```
+
+---
+
+## ⚙️ Arquitectura del Sistema
+
+```mermaid
+graph TD
+    A[Operador / Mando Central] -->|Define Zona de Interés| B(Interfaz Web Streamlit / Node.js)
+    B -->|Coordenadas| C{Backend Python}
+    C -->|API Request| D[Sentinel Hub API]
+    D -->|Imágenes Satelitales PNG| C
+    C -->|Inferencia| E[Modelo YOLOv8 / Ollama]
+    E -->|Detecciones & Coordenadas| C
+    C -->|Almacenamiento| F[(SQLite DB Cifrada)]
+    C -->|Evaluación de Umbral| G{¿Amenaza Detectada?}
+    G -->|Sí| H[Servidor SMTP]
+    H -->|Email de Alerta| I[Comandancia / Oficiales]
+    G -->|No| B
+```
+
+---
+
+## 🔄 Flujo de Operación (Diagrama de Secuencia)
+
+```mermaid
+sequenceDiagram
+    participant O as Operador
+    participant UI as Interfaz (Streamlit)
+    participant Core as AEGIS Backend
+    participant SH as Sentinel Hub
+    participant AI as YOLO / Ollama
+    participant DB as SQLite
+    participant Mail as Servidor Correo
+
+    O->>UI: Dibuja Polígono de Vigilancia
+    UI->>Core: Inicia Monitoreo Continuo
+    loop Intervalo de Actualización
+        Core->>SH: Solicita Imágenes (BBox)
+        SH-->>Core: Retorna Imágenes Satelitales
+        Core->>AI: Procesa Imagen (Detectar Vehículos)
+        AI-->>Core: Conteo y Tipología
+        Core->>DB: Guarda Registro (Timestamp, Cantidad, Path)
+        alt Cantidad >= Umbral Crítico
+            Core->>Mail: Dispara Alerta Militar
+            Mail-->>O: Notificación Urgente Recibida
+        end
+        Core->>UI: Actualiza Mapa y Gráficos
+    end
+```
+
+---
+
+## 🚀 Instalación y Despliegue
+
+### Requisitos Previos
+
+- Python 3.10+
+- Node.js 18+ (Para el frontend avanzado)
+- Cuenta en [Sentinel Hub](https://www.sentinel-hub.com/)
+- [Ollama](https://ollama.ai) instalado localmente (Opcional para análisis heurístico)
+
+### Pasos de Configuración
+
+1. **Clonar el repositorio y ejecutar el setup automatizado**:
+   ```cmd
+   git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar.git
+   cd MonitoreoSatelitalMilitar
+   setup.bat
+   ```
+2. **Configurar credenciales**:
+   El script `setup.bat` generará automáticamente un archivo `.env` con claves criptográficas. Debes editarlo y proporcionar:
+   - `SENTINEL_CLIENT_ID` y `SENTINEL_CLIENT_SECRET`
+   - Credenciales SMTP para las alertas.
+3. **Descargar modelos de IA**:
+   Coloca tus modelos pre-entrenados (ej. `yolov8_military.pt`) en el directorio `/modelos`.
+4. **Iniciar el sistema**:
+   - Backend: `start_backend.bat`
+   - Frontend: `start_frontend.bat`
+
+---
+
+## 💰 Apoya este Proyecto (Support)
 
 <div align="center">
 
-### ₿ Bitcoin Donations Welcome!
+### ₿ Donaciones en Bitcoin
+
+El desarrollo de sistemas de defensa y seguridad requiere recursos constantes. Tu apoyo es fundamental.
 
 <img src="https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white" alt="Bitcoin"/>
 
-```
+```text
 ┌─────────────────────────────────────┐
 │    ₿  BTC Donation Address  ₿      │
 ├─────────────────────────────────────┤
@@ -43,236 +161,39 @@
 
 **Address:** `bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw`
 
-*Your donations help maintain this defense technology project!* 🙏
+*¡Tus donaciones ayudan a mantener operativa esta tecnología estratégica!* 🙏
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## 🛡️ Seguridad y Consideraciones Éticas
 
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Detection Capabilities](#detection-capabilities)
-- [Security](#security)
-- [License](#license)
+### Medidas Implementadas
+- ✅ Bases de datos y archivos de imagen cifrados mediante Fernet (claves autogeneradas).
+- ✅ Credenciales inyectadas por variables de entorno (`.env`), nunca en código fuente.
+- ✅ Autenticación JWT en el panel de control.
 
-## 🚀 Installation
-
-### Prerequisites
-
-- Python 3.8+
-- OpenCV
-- TensorFlow/PyTorch
-- OpenAI API key
-- Satellite imagery access (Planet, Sentinel, etc.)
-
-### Setup
-
-```bash
-# Clone repository
-git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar.git
-cd MonitoreoSatelitalMilitar
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
-```
-
-## ⚙️ Configuration
-
-### .env file
-
-```env
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key
-GPT_MODEL=gpt-4-vision-preview
-
-# Satellite Data Sources
-SATELLITE_API_KEY=your_satellite_api_key
-SATELLITE_PROVIDER=sentinel  # or "planet", "maxar"
-
-# Detection Settings
-CONFIDENCE_THRESHOLD=0.75
-MIN_VEHICLE_SIZE=50  # pixels
-MAX_IMAGE_AGE=24  # hours
-
-# Alert Settings
-ALERT_WEBHOOK=your_webhook_url
-ALERT_THRESHOLD=medium  # low, medium, high, critical
-
-# Database
-DATABASE_URL=sqlite:///base_de_datos/military_monitoring.db
-```
-
-## 💻 Usage
-
-### Basic Usage
-
-```bash
-# Start monitoring system
-python main.py
-```
-
-### Advanced Usage
-
-```python
-from main import SatelliteMonitor
-from modelos import VehicleDetector, ThreatAnalyzer
-
-# Initialize system
-monitor = SatelliteMonitor()
-detector = VehicleDetector(model_path="modelos/vehicle_detector.h5")
-analyzer = ThreatAnalyzer()
-
-# Process satellite image
-image_path = "imagenes/satellite_image.jpg"
-detections = detector.detect(image_path)
-
-# Analyze threats
-for detection in detections:
-    threat_level = analyzer.assess_threat(detection)
-    if threat_level >= "medium":
-        monitor.send_alert(detection, threat_level)
-```
-
-## 🎯 Detection Capabilities
-
-### Vehicle Types
-
-| Category | Examples | Detection Accuracy |
-|----------|----------|--------------------|
-| **Tanks** | M1 Abrams, T-90, Leopard 2 | 92% |
-| **APCs** | Bradley, BMP, LAV | 88% |
-| **Artillery** | HIMARS, M777, Howitzers | 85% |
-| **Aircraft** | F-35, Su-57, MiG-29 | 94% |
-| **Naval** | Destroyers, Carriers, Subs | 90% |
-| **Missiles** | SAM sites, Launchers | 87% |
-
-## 🧠 AI Analysis
-
-### GPT Vision Integration
-
-The system uses GPT-4 Vision to:
-
-1. **Verify Detections**: Confirm computer vision results
-2. **Context Analysis**: Understand deployment patterns
-3. **Threat Assessment**: Evaluate strategic implications
-4. **Report Generation**: Create human-readable intelligence reports
-
-## 💾 Database Schema
-
-```sql
-CREATE TABLE detections (
-    id INTEGER PRIMARY KEY,
-    timestamp DATETIME,
-    latitude REAL,
-    longitude REAL,
-    vehicle_type VARCHAR(50),
-    confidence REAL,
-    threat_level VARCHAR(20),
-    image_path VARCHAR(255),
-    analyst_notes TEXT
-);
-```
-
-## 🔒 Security & Compliance
-
-### Data Protection
-
-- ✅ Encrypted data storage
-- ✅ Secure API communications
-- ✅ Access control and authentication
-- ✅ Audit logging
-- ✅ GDPR compliance for civilian areas
-
-### Ethical Considerations
-
-⚠️ **This system is for authorized use only:**
-
-- Military and intelligence agencies
-- Licensed defense contractors
-- Authorized research institutions
-- Humanitarian early warning systems
-
-**Prohibited Uses:**
-- Unauthorized surveillance
-- Privacy violations
-- Targeting civilian populations
-- Commercial espionage
-
-## ⚠️ Legal Disclaimer
-
-**IMPORTANT LEGAL NOTICE:**
-
-This software is intended for:
-- Authorized military and intelligence use
-- Academic and research purposes
-- Humanitarian early warning systems
-- Compliance with international law
-
-**Users must:**
-- Obtain proper authorization
-- Comply with local laws and regulations
-- Respect privacy and human rights
-- Follow Rules of Engagement (ROE)
-- Maintain operational security
-
-## 🤝 Contributing
-
-Due to the sensitive nature of this project, contributions require:
-
-1. Security clearance verification
-2. Signed NDA
-3. Code review by authorized personnel
-4. Compliance certification
-
-## 📝 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-**Note:** While the software is MIT licensed, use cases are restricted by applicable laws and regulations.
-
-## 👤 Author
-
-**murdok1982**
-
-- GitHub: [@murdok1982](https://github.com/murdok1982)
-- LinkedIn: [Gustavo Lobato Clara](https://www.linkedin.com/in/gustavo-lobato-clara-2b446b102/)
-- Email: gustavolobatoclara@gmail.com
-
-## 🙏 Acknowledgments
-
-- OpenAI GPT-4 Vision
-- OpenCV Community
-- TensorFlow/PyTorch Teams
-- Satellite imagery providers
-- Defense research community
-
-## 📈 Roadmap
-
-- [ ] Support for more satellite data sources
-- [ ] Improved classification models
-- [ ] Real-time video feed analysis
-- [ ] Multi-spectral image support
-- [ ] Automated tracking and prediction
-- [ ] Integration with military systems
-- [ ] Mobile app for field officers
-- [ ] Advanced threat modeling
+### Descargo de Responsabilidad (Disclaimer)
+⚠️ **SÓLO PARA USO AUTORIZADO** ⚠️
+Este software está diseñado para agencias gubernamentales, inteligencia militar, y contratistas de defensa debidamente autorizados.
+El uso para espionaje comercial, vigilancia no autorizada o violación de derechos de privacidad está estrictamente prohibido y penado por la ley.
 
 ---
 
-⚠️ **For authorized use only. Handle with appropriate security classifications.**
+## 👤 Autor e Información de Contacto
 
-⭐ **Star this repo if you find it useful!**  
-🐛 **[Report bugs](https://github.com/murdok1982/MonitoreoSatelitalMilitar/issues)** (Security issues via private disclosure)
+**Arquitecto de Inteligencia Artificial:** murdok1982 (Gustavo Lobato Clara)
 
-**Stay Vigilant! 📡**
+- 🐙 GitHub: [@murdok1982](https://github.com/murdok1982)
+- 💼 LinkedIn: [Gustavo Lobato Clara](https://www.linkedin.com/in/gustavo-lobato-clara-2b446b102/)
+- 📧 Email: gustavolobatoclara@gmail.com
+
+---
+
+> *"Si vis pacem, para bellum."* — Si quieres la paz, prepárate para la guerra.
+
+<div align="center">
+  <br>
+  ⭐ <b>Si consideras este sistema útil para tus operaciones, no olvides darle una estrella en GitHub.</b>
+</div>
