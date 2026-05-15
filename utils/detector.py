@@ -1,53 +1,210 @@
-import os
-from typing import Tuple, List
-from config import YOLO_MODEL_PATH, CONFIDENCE_THRESHOLD
+"""
+Vehicle Detector — AEGIS-IMINT
+Runs YOLO inference on satellite imagery to detect military vehicles.
 
-# Military vehicle class names (for models trained on xView/DOTA)
-MILITARY_CLASSES = {
-    'vehicle', 'military vehicle', 'tank', 'armored vehicle', 'truck',
-    'car', 'van', 'bus', 'helicopter', 'aircraft', 'ship', 'boat',
-    'fixed-wing aircraft', 'small aircraft', 'cargo truck', 'engineering vehicle',
-    'ground track vehicle',
+Extended: detectar_vehiculos() accepts an optional `annotate` flag.
+When True, a MilitaryAnnotator overlay is generated and the annotated
+image path is returned as a third element of the return tuple.
+"""
+from __future__ import annotations
+
+import logging
+import os
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+import cv2
+import numpy as np
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Optional imports — gracefully degrade if ultralytics / annotator unavailable
+# ---------------------------------------------------------------------------
+try:
+    from ultralytics import YOLO
+    _YOLO_AVAILABLE = True
+except ImportError:
+    _YOLO_AVAILABLE = False
+    logger.warning("ultralytics not installed — YOLO detection disabled")
+
+try:
+    from utils.annotator import MilitaryAnnotator, Detection  # package context
+except ImportError:
+    try:
+        from annotator import MilitaryAnnotator, Detection    # standalone / test context
+    except ImportError:
+        MilitaryAnnotator = None  # type: ignore[assignment,misc]
+        Detection = None          # type: ignore[assignment]
+        logger.warning("annotator module not found — annotation disabled")
+
+
+# ---------------------------------------------------------------------------
+# Threat level determination
+# ---------------------------------------------------------------------------
+
+_THREAT_THRESHOLDS = {
+    'ROJO':     5,   # ≥5 vehicles → critical
+    'NARANJA':  3,   # ≥3 vehicles → high
+    'AMARILLO': 1,   # ≥1 vehicle  → medium
+    'VERDE':    0,   # no vehicles → clear
 }
 
-_model = None
+_HIGH_THREAT_CLASSES = {'tank', 'armored vehicle', 'military vehicle'}
 
 
-def _load_model():
-    global _model
-    if _model is None:
-        if not os.path.exists(YOLO_MODEL_PATH):
-            raise FileNotFoundError(
-                f"Modelo no encontrado: {YOLO_MODEL_PATH}\n"
-                "Descarga un modelo pre-entrenado de xView o DOTA y colócalo en /modelos/"
-            )
-        from ultralytics import YOLO
-        _model = YOLO(YOLO_MODEL_PATH)
-    return _model
-
-
-def detectar_vehiculos(imagen_path: str) -> Tuple[int, List[str]]:
+def calcular_nivel_amenaza(detecciones: list, n_vehicles: int) -> str:
     """
-    Run YOLO inference. Returns (count, class_names_list).
-    Filters for military-relevant classes only; falls back to all
-    detected classes when the model uses a general-purpose vocabulary.
+    Derive a threat level string from detection count and class mix.
+    Returns one of: VERDE / AMARILLO / NARANJA / ROJO
     """
-    model = _load_model()
-    results = model.predict(imagen_path, conf=CONFIDENCE_THRESHOLD, verbose=False)
+    if n_vehicles == 0:
+        return 'VERDE'
 
-    clases_detectadas = []
+    names_lower = {d.get('clase', '').lower() for d in detecciones}
+    if names_lower & _HIGH_THREAT_CLASSES or n_vehicles >= _THREAT_THRESHOLDS['ROJO']:
+        return 'ROJO'
+    if n_vehicles >= _THREAT_THRESHOLDS['NARANJA']:
+        return 'NARANJA'
+    return 'AMARILLO'
+
+
+# ---------------------------------------------------------------------------
+# Core detection function
+# ---------------------------------------------------------------------------
+
+def detectar_vehiculos(
+    imagen_path: str,
+    modelo_path: str = 'yolov8n.pt',
+    conf_threshold: float = 0.35,
+    output_dir: str = 'imagenes',
+    annotate: bool = True,
+) -> Tuple[List[dict], str, Optional[str]]:
+    """
+    Run YOLO vehicle detection on *imagen_path*.
+
+    Parameters
+    ----------
+    imagen_path    : Path to the satellite image to analyse.
+    modelo_path    : Path (or Ultralytics hub name) of the YOLO model weights.
+    conf_threshold : Minimum confidence to retain a detection.
+    output_dir     : Directory for saving result images.
+    annotate       : When True, produce a military-annotated overlay image and
+                     return its path as the third element of the return tuple.
+
+    Returns
+    -------
+    detecciones    : List of dicts with keys {clase, confianza, bbox}.
+    nivel_amenaza  : Threat level string (VERDE/AMARILLO/NARANJA/ROJO).
+    annotated_path : Path to the annotated image, or None when annotate=False
+                     or annotation is unavailable.
+    """
+    if not os.path.exists(imagen_path):
+        raise FileNotFoundError(f"Image not found: {imagen_path}")
+
+    # ------------------------------------------------------------------
+    # YOLO inference
+    # ------------------------------------------------------------------
+    if not _YOLO_AVAILABLE:
+        logger.error("YOLO unavailable — returning empty detections")
+        return [], 'VERDE', None
+
+    try:
+        model = YOLO(modelo_path)
+    except Exception as exc:
+        logger.error("Failed to load YOLO model '%s': %s", modelo_path, exc)
+        return [], 'VERDE', None
+
+    try:
+        results = model(imagen_path, conf=conf_threshold, verbose=False)
+    except Exception as exc:
+        logger.error("YOLO inference failed: %s", exc)
+        return [], 'VERDE', None
+
+    # ------------------------------------------------------------------
+    # Parse results into a standard list of dicts
+    # ------------------------------------------------------------------
+    detecciones: List[dict] = []
     for r in results:
-        if r.boxes is not None and r.names:
-            for box in r.boxes:
-                cls_id = int(box.cls[0])
-                cls_name = r.names.get(cls_id, 'unknown').lower()
-                clases_detectadas.append(cls_name)
+        if r.boxes is None:
+            continue
+        for box in r.boxes:
+            x1, y1, x2, y2 = [int(v) for v in box.xyxy[0].tolist()]
+            cls_id = int(box.cls[0])
+            cls_name = r.names.get(cls_id, 'unknown')
+            conf = float(box.conf[0])
+            detecciones.append({
+                'clase': cls_name,
+                'confianza': conf,
+                'bbox': [x1, y1, x2, y2],
+            })
 
-    # Filter to military-relevant classes; keep all if none match (general model)
-    militares = [c for c in clases_detectadas if any(m in c for m in MILITARY_CLASSES)]
-    count = len(militares) if militares else len(clases_detectadas)
-    return count, clases_detectadas
+    nivel_amenaza = calcular_nivel_amenaza(detecciones, len(detecciones))
+    logger.info("detectar_vehiculos: %d detections, nivel=%s",
+                len(detecciones), nivel_amenaza)
+
+    # ------------------------------------------------------------------
+    # Optional annotation
+    # ------------------------------------------------------------------
+    annotated_path: Optional[str] = None
+    if annotate and MilitaryAnnotator is not None:
+        try:
+            annotated_path = MilitaryAnnotator().annotate_from_yolo_results(
+                imagen_path, results, threat_level=nivel_amenaza
+            )
+            logger.info("Annotated image saved: %s", annotated_path)
+        except Exception as exc:
+            logger.warning("Annotation failed (non-fatal): %s", exc)
+
+    return detecciones, nivel_amenaza, annotated_path
 
 
-def model_available() -> bool:
-    return os.path.exists(YOLO_MODEL_PATH)
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+if __name__ == '__main__':
+    import unittest
+    import tempfile
+
+    class TestDetectorModule(unittest.TestCase):
+
+        def test_calcular_nivel_amenaza_no_vehicles(self):
+            self.assertEqual(calcular_nivel_amenaza([], 0), 'VERDE')
+
+        def test_calcular_nivel_amenaza_one_vehicle(self):
+            self.assertEqual(
+                calcular_nivel_amenaza([{'clase': 'car'}], 1), 'AMARILLO'
+            )
+
+        def test_calcular_nivel_amenaza_high_threat_class(self):
+            result = calcular_nivel_amenaza([{'clase': 'tank'}], 1)
+            self.assertEqual(result, 'ROJO')
+
+        def test_calcular_nivel_amenaza_many_vehicles(self):
+            dets = [{'clase': 'truck'}] * 5
+            result = calcular_nivel_amenaza(dets, 5)
+            self.assertEqual(result, 'ROJO')
+
+        def test_detectar_vehiculos_missing_file_raises(self):
+            with self.assertRaises(FileNotFoundError):
+                detectar_vehiculos('/no/such/image.png')
+
+        def test_detectar_vehiculos_returns_three_tuple(self):
+            """When YOLO is unavailable the function still returns a 3-tuple."""
+            if _YOLO_AVAILABLE:
+                self.skipTest("YOLO is available; skipping degraded-path test")
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+                tmp = f.name
+            try:
+                dummy = np.zeros((100, 100, 3), dtype=np.uint8)
+                cv2.imwrite(tmp, dummy)
+                result = detectar_vehiculos(tmp)
+                self.assertIsInstance(result, tuple)
+                self.assertEqual(len(result), 3)
+                detecciones, nivel, ann_path = result
+                self.assertIsInstance(detecciones, list)
+                self.assertIsInstance(nivel, str)
+            finally:
+                os.unlink(tmp)
+
+    unittest.main(verbosity=2)
