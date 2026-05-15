@@ -1,11 +1,29 @@
+# Core
 streamlit>=1.35.0
 folium>=0.18.0
 streamlit-folium>=0.22.0
+python-dotenv>=1.0.1
+pandas>=2.2.0
+numpy>=1.26.0
+requests>=2.32.0
+
+# Satellite imagery
 sentinelhub>=3.10.0
+
+# Computer vision & AI
 ultralytics>=8.2.0
 opencv-python-headless>=4.10.0
-numpy>=1.26.0
-python-dotenv>=1.0.1
+
+# LLM / local AI
+# ollama is accessed via HTTP — no pip package needed
+
+# Security / Crypto
 cryptography>=43.0.0
-requests>=2.32.0
-pandas>=2.2.0
+
+# PDF reports
+fpdf2>=2.7.9
+
+# REST API
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
