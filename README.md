@@ -1,168 +1,127 @@
 <div align="center">
 
 # 🦅 AEGIS-IMINT: Monitoreo Satelital Militar
-### *Inteligencia Estratégica y Seguridad de Vanguardia — v2.0*
+### *Inteligencia Estratégica y Seguridad de Vanguardia — v3.0*
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![YOLOv8](https://img.shields.io/badge/AI-YOLOv8-purple.svg)](https://github.com/ultralytics/ultralytics)
-[![Ollama](https://img.shields.io/badge/LLM-Ollama%20Local-green.svg)](https://ollama.ai)
+[![Ollama](https://img.shields.io/badge/LLM-Ollama%20llava:7b-green.svg)](https://ollama.ai)
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![Sentinel-2](https://img.shields.io/badge/SAT-Sentinel--2%20L1C-blue.svg)](https://www.sentinel-hub.com/)
-[![Docker](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED.svg)](https://docs.docker.com/compose/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **"Vigilancia incesante, respuesta inmediata."**  
-> Sistema de análisis de imágenes satelitales impulsado por IA para la detección de vehículos militares, evaluación de amenazas y alerta temprana.
+> **"Vigilancia incesante, respuesta inmediata."**
 
 </div>
 
 ---
 
-## 🪖 Características
+## 🪖 Capacidades Operacionales
 
-- 📡 **Imágenes Sentinel-2 L1C** con selección automática de menor nubosidad
-- 🎯 **Detección YOLOv8** con filtrado de clases militares (vehículos, aeronaves, navíos)
-- 🧠 **Análisis IMINT con Ollama** (llava:7b) — Informes PMESII-PT en español, clasificación NATO
-- 🚨 **Alertas duales** — Email HTML cifrado + Telegram Bot
-- 🔐 **Cifrado Fernet** — Clave auto-generada, imágenes y base de datos protegidos
-- 🗺️ **Dashboard Streamlit** — Mapa interactivo, historial, gestión de zonas
-- 🐳 **Docker Compose** — Despliegue con Ollama sidecar (GPU si disponible)
+| Módulo | Función | Estado |
+|---|---|---|
+| 📡 **Sentinel-2 L1C** | Imágenes satelitales con selección automática de menor nubosidad | ✅ |
+| 🎯 **YOLOv8 Military** | Detección con filtrado de clases NATO (vehículo/armadura/aire/naval) | ✅ |
+| 🖼️ **Anotador Táctico** | Bounding boxes militares con indicadores de esquina y niveles de amenaza | ✅ |
+| 🔄 **Change Detection** | Comparación imagen actual vs anterior para detectar nuevas posiciones | ✅ |
+| 🧠 **Ollama IMINT** | Informes PMESII-PT en español con llava:7b (análisis visual) | ✅ |
+| 🌐 **GDELT Cross-Ref** | Correlación con eventos noticiosos internacionales (sin API key) | ✅ |
+| 📊 **Análisis Temporal** | Series temporales 30 días, anomalías, tempo operacional NATO | ✅ |
+| ⏰ **Watchdog Daemon** | Escaneo automático de zonas guardadas sin intervención del operador | ✅ |
+| 🔐 **Cifrado Fernet** | Imágenes y base de datos cifradas con clave auto-generada | ✅ |
+| 📄 **PDF IMINT** | Informes clasificados con imágenes, gráficos y huella SHA-256 | ✅ |
+| 🔌 **FastAPI C2 API** | 9 endpoints REST para integración con sistemas de mando externos | ✅ |
+| 🚨 **Alertas duales** | Email HTML + Telegram Bot configurable | ✅ |
 
 ---
 
-## 🧠 Arquitectura del Sistema
+## 🏗️ Arquitectura del Sistema
 
 ```mermaid
 graph TD
-    A[Operador] -->|Define Polígono| B(Dashboard Streamlit)
-    B -->|BBox WGS84| C{AEGIS Backend}
-    C -->|OAuth2| D[Sentinel Hub API]
-    D -->|Imagen PNG| C
-    C -->|Inferencia conf≥0.45| E[YOLOv8 Military]
-    E -->|count + clases| C
-    C -->|Prompt PMESII-PT| F[Ollama llava:7b]
-    F -->|Informe IMINT| C
-    C -->|AES-128-CBC| G[(SQLite Cifrado)]
-    C -->|Amenaza ≥ umbral| H{Alertas}
-    H -->|HTML Email| I[SMTP]
-    H -->|Markdown| J[Telegram Bot]
-    I & J --> K[Comandancia]
-    C -->|Actualiza| B
+    classDef ui fill:#1a3a4a,stroke:#3ddc84,color:#fff
+    classDef core fill:#2a1a4a,stroke:#9b59b6,color:#fff
+    classDef data fill:#1a2a1a,stroke:#27ae60,color:#fff
+    classDef ext fill:#3a2a1a,stroke:#e67e22,color:#fff
+    classDef api fill:#1a1a3a,stroke:#3498db,color:#fff
+
+    subgraph UI["🖥️ Interfaz de Usuario"]
+        Dashboard["Streamlit Dashboard\n3 modos operacionales"]:::ui
+    end
+
+    subgraph API["🔌 C2 REST API (FastAPI :8502)"]
+        FastAPI["9 endpoints + Rate Limiting\nX-API-Key auth"]:::api
+        PDFGen["PDF Report Generator\nfpdf2 + SHA-256"]:::api
+    end
+
+    subgraph Core["⚙️ Motor de Análisis"]
+        Sentinel["Sentinel-2 Downloader\n(mosaicking leastCC)"]:::core
+        YOLO["YOLOv8 Detector\n(NATO class filter)"]:::core
+        Annotator["Military Annotator\n(bounding boxes tácticos)"]:::core
+        ChangeDetect["Change Detection\n(diff morfológico)"]:::core
+        Ollama["Ollama LLM\nllava:7b PMESII-PT"]:::core
+        GDELT["GDELT Cross-Ref\n(sin API key)"]:::core
+        Temporal["Temporal Analyzer\n(30 días, anomalías)"]:::core
+        Watchdog["Watchdog Daemon\n(threading, auto-scan)"]:::core
+    end
+
+    subgraph Data["💾 Datos"]
+        DB["SQLite + Fernet\n(cifrado AES-128)"]:::data
+        ImgStore["Imágenes satelitales\n+ anotadas + diff"]:::data
+        Reports["PDFs clasificados\n(RESTRINGIDO/CONFIDENCIAL)"]:::data
+    end
+
+    subgraph Ext["🌐 Servicios Externos"]
+        SentHub["Sentinel Hub API\n(ESA Copernicus)"]:::ext
+        GdeltAPI["GDELT 2.0 API\n(libre, sin auth)"]:::ext
+        SMTP["SMTP / Telegram"]:::ext
+    end
+
+    Dashboard --> Sentinel & YOLO & Ollama & GDELT & Temporal
+    FastAPI --> Sentinel & YOLO & Ollama & GDELT & Temporal & PDFGen
+    Sentinel --> SentHub
+    YOLO --> Annotator & ChangeDetect
+    GDELT --> GdeltAPI
+    Watchdog --> Sentinel & YOLO
+    YOLO & Ollama & GDELT --> DB
+    Annotator & ChangeDetect --> ImgStore
+    PDFGen --> Reports
+    DB --> Reports
+    Core --> SMTP
 ```
+
+---
+
+## 🔄 Flujo de Análisis Completo
 
 ```mermaid
 sequenceDiagram
-    participant Op as Operador
-    participant UI as Streamlit UI
-    participant Core as AEGIS Core
+    participant Op as Operador / C2
+    participant API as FastAPI/Dashboard
     participant SH as Sentinel Hub
-    participant YOLO as YOLOv8
-    participant LLM as Ollama LLM
+    participant YOLOv8
+    participant LLM as Ollama llava:7b
+    participant GDELT
     participant DB as SQLite Fernet
 
-    Op->>UI: Dibuja polígono + pulsa Analizar
-    UI->>Core: bbox coords
-    Core->>SH: GET imagen (últimas 72h, min nubosidad)
-    SH-->>Core: PNG multibanda
-    Core->>YOLO: predict(conf=0.45)
-    YOLO-->>Core: [(clase, confianza, bbox)]
-    Core->>LLM: Prompt PMESII-PT + imagen base64
-    LLM-->>Core: Informe IMINT NATO
-    Core->>DB: INSERT cifrado (Fernet)
-    alt Vehículos ≥ umbral
-        Core->>Core: enviar_alertas()
+    Op->>API: POST /api/analyze {bbox, zone_name}
+    API->>SH: GET imagen (últimas 72h, min nubosidad)
+    SH-->>API: PNG RGB 10m/px
+    API->>YOLOv8: predict(conf=0.45)
+    YOLOv8-->>API: detecciones + clases NATO
+    API->>API: MilitaryAnnotator → imagen anotada
+    API->>API: ChangeDetector → diff vs imagen anterior
+    API->>LLM: Prompt PMESII-PT + imagen base64
+    LLM-->>API: Informe IMINT clasificado
+    API->>GDELT: query eventos militares en zona
+    GDELT-->>API: correlación mediática
+    API->>DB: INSERT (cifrado Fernet)
+    alt vehículos ≥ umbral
+        API->>Op: Email HTML + Telegram alert
     end
-    Core-->>UI: Resultados + imagen anotada
+    API-->>Op: DetectionResponse (JSON)
+    Note over API: Background: generar PDF clasificado
 ```
-
----
-
-## ⚙️ Instalación
-
-### Requisitos
-- Python 3.10+
-- Cuenta [Sentinel Hub](https://www.sentinel-hub.com/) (gratis para uso limitado)
-- [Ollama](https://ollama.ai) instalado localmente (opcional, para análisis LLM)
-
-### Setup automático
-
-**Linux / macOS:**
-```bash
-git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
-cd MonitoreoSatelitalMilitar
-bash setup.sh
-# Edita .env con tus credenciales
-bash start.sh
-```
-
-**Windows:**
-```bat
-git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
-cd MonitoreoSatelitalMilitar
-setup.bat
-# Edita .env con tus credenciales
-start.bat
-```
-
-**Docker:**
-```bash
-cp .env.example .env
-# Edita .env
-docker compose up -d
-# Dashboard en http://localhost:8501
-```
-
-### Configuración `.env`
-
-```env
-# Sentinel Hub (requerido)
-SENTINEL_CLIENT_ID=tu_client_id
-SENTINEL_CLIENT_SECRET=tu_client_secret
-
-# Modelo YOLO (ver /modelos/README.md)
-YOLO_MODEL_PATH=modelos/yolov8_military.pt
-CONFIDENCE_THRESHOLD=0.45
-
-# Ollama (opcional - análisis IMINT)
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llava:7b
-
-# Alertas Email
-EMAIL_FROM=tu@gmail.com
-EMAIL_PASSWORD=tu_app_password
-EMAIL_TO=comandante@ejemplo.com
-
-# Alertas Telegram (alternativa)
-TELEGRAM_BOT_TOKEN=tu_bot_token
-TELEGRAM_CHAT_ID=tu_chat_id
-
-# Sensibilidad
-SENSIBILIDAD_ALERTA=5
-```
-
----
-
-## 🤖 Modelo YOLO
-
-Ver `/modelos/README.md` para instrucciones detalladas de descarga.
-
-Datasets recomendados para entrenamiento:
-
-| Dataset | Contenido | URL |
-|---|---|---|
-| xView | Vehículos, aeronaves, navíos satelitales | [xviewdataset.org](http://xviewdataset.org/) |
-| DOTA | Objetos aéreos multi-clase (15 categorías) | [captain-whu.github.io/DOTA](https://captain-whu.github.io/DOTA/) |
-| VEDAI | 3000 imágenes aéreas de vehículos | [VEDAI](https://downloads.greyc.fr/vedai/) |
-| Military Aircraft | Aeronaves militares desde arriba | HuggingFace |
-
----
-
-## 🗺️ Modos de Operación
-
-| Modo | Función |
-|---|---|
-| **Monitoreo en Vivo** | Dibuja zona, descarga imagen Sentinel-2, detecta y genera informe IMINT |
-| **Historial / Análisis** | Gráfico de tendencias, tabla de detecciones con informes LLM |
-| **Zonas Guardadas** | Gestiona zonas predefinidas de vigilancia permanente |
 
 ---
 
@@ -170,66 +129,165 @@ Datasets recomendados para entrenamiento:
 
 ```
 MonitoreoSatelitalMilitar/
-├── main.py                    # Aplicación Streamlit principal
-├── config.py                  # Configuración desde .env
-├── requirements.txt           # Dependencias pip
-├── .env.example               # Plantilla de configuración
-├── setup.sh / setup.bat       # Instalación automática
-├── start.sh / start.bat       # Arranque rápido
-├── Dockerfile                 # Imagen Docker
-├── docker-compose.yml         # Stack completo con Ollama
+├── main.py                       # Dashboard Streamlit (3 modos)
+├── config.py                     # Config desde .env (sin hardcoding)
+├── requirements.txt              # 15 dependencias pip
+├── .env.example                  # Plantilla completa de configuración
+├── setup.sh / setup.bat          # Instalación automática
+├── start.sh / start.bat          # Arranque dashboard
+├── start_api.sh / start_api.bat  # Arranque API REST
+├── Dockerfile + docker-compose.yml
+│
 ├── utils/
-│   ├── sentinel.py            # Descarga Sentinel-2 (fecha dinámica)
-│   ├── detector.py            # YOLOv8 con filtrado militar
-│   ├── ollama_analyst.py      # Análisis IMINT PMESII-PT
-│   ├── alerts.py              # Email HTML + Telegram
-│   ├── database.py            # SQLite thread-safe + zonas
-│   └── crypto.py              # Cifrado Fernet
-├── modelos/
-│   └── README.md              # Instrucciones descarga de modelos
-├── base_de_datos/             # SQLite (auto-creado)
-├── imagenes/                  # Imágenes satelitales (auto-creado)
-└── logs/                      # Logs de operación
+│   ├── sentinel.py               # Descarga Sentinel-2 (fecha dinámica)
+│   ├── detector.py               # YOLOv8 + filtro NATO + anotación
+│   ├── annotator.py              # Anotador táctico militar
+│   ├── change_detection.py       # Detección de cambios por diff
+│   ├── ollama_analyst.py         # PMESII-PT + clasificación NATO
+│   ├── gdelt.py                  # Cross-ref GDELT sin API key
+│   ├── temporal_analysis.py      # Series temporales 30 días
+│   ├── scheduler.py              # Watchdog daemon threading
+│   ├── alerts.py                 # Email HTML + Telegram
+│   ├── database.py               # SQLite thread-safe + zonas
+│   ├── crypto.py                 # Fernet key management
+│   └── report_generator.py       # PDF IMINT con fpdf2
+│
+├── api/
+│   ├── main.py                   # 9 endpoints FastAPI
+│   ├── middleware.py             # Rate limiting + request logging
+│   └── run.py                    # uvicorn launcher
+│
+├── training/
+│   ├── prepare_dataset.py        # xView → YOLOv8 format
+│   ├── train.py                  # Fine-tuning pipeline YOLOv8
+│   └── README.md                 # Guía completa de entrenamiento
+│
+├── tests/
+│   ├── test_api.py               # 38 tests FastAPI
+│   └── test_report_generator.py  # 20 tests PDF
+│
+├── docs/
+│   └── API.md                    # Documentación C2 REST API
+│
+├── modelos/README.md             # Guía descarga modelos
+├── base_de_datos/                # SQLite (auto-cifrado)
+├── imagenes/                     # Imágenes satelitales y anotadas
+├── reports/                      # PDFs clasificados
+└── logs/                         # Logs de operación
+```
+
+---
+
+## 🚀 Instalación y Arranque
+
+### Instalación automática
+
+```bash
+# Linux/macOS
+git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
+cd MonitoreoSatelitalMilitar
+bash setup.sh
+nano .env   # Introduce tus credenciales
+
+# Windows
+git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
+cd MonitoreoSatelitalMilitar
+setup.bat
+
+# Docker (con GPU para Ollama)
+cp .env.example .env && nano .env
+docker compose up -d
+```
+
+### Arranque de servicios
+
+```bash
+# Dashboard Streamlit (puerto 8501)
+bash start.sh
+
+# API REST C2 (puerto 8502)
+bash start_api.sh
+
+# Ambos en paralelo
+bash start.sh & bash start_api.sh
+```
+
+---
+
+## 🔌 API REST — Integración C2
+
+**Autenticación:** `X-API-Key: <tu_clave>` (configura `AEGIS_API_KEY` en `.env`)
+
+```bash
+# Estado del sistema
+curl -H "X-API-Key: $KEY" http://localhost:8502/api/status
+
+# Analizar zona
+curl -X POST -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
+  -d '{"lon_min":2.0,"lat_min":48.5,"lon_max":2.5,"lat_max":49.0,"zone_name":"Paris Nord","generate_report":true}' \
+  http://localhost:8502/api/analyze
+
+# Historial de detecciones
+curl -H "X-API-Key: $KEY" "http://localhost:8502/api/history?limit=20"
+
+# Análisis temporal 30 días
+curl -H "X-API-Key: $KEY" "http://localhost:8502/api/temporal?days=30"
+
+# Correlación GDELT
+curl -H "X-API-Key: $KEY" "http://localhost:8502/api/gdelt?lon_min=2.0&lat_min=48.5&lon_max=2.5&lat_max=49.0&vehicles=12"
+
+# Listar/descargar informes PDF
+curl -H "X-API-Key: $KEY" http://localhost:8502/api/reports
+curl -H "X-API-Key: $KEY" http://localhost:8502/api/reports/AEGIS_IMINT_ABC123_20260515.pdf -o informe.pdf
+```
+
+Documentación interactiva: `http://localhost:8502/api/docs`
+
+---
+
+## 🤖 Entrenamiento de Modelo Personalizado
+
+```bash
+# 1. Descargar dataset xView
+#    http://xviewdataset.org/ (requiere registro)
+
+# 2. Preparar dataset (convierte a formato YOLOv8 con clases NATO)
+python training/prepare_dataset.py \
+  --geojson xview_train.geojson \
+  --images xview_images/ \
+  --output training/dataset
+
+# 3. Fine-tuning (GPU recomendado, 8GB+ VRAM)
+python training/train.py \
+  --dataset training/dataset/dataset.yaml \
+  --base-model yolov8m.pt \
+  --epochs 100 \
+  --batch 16
+
+# Modelo resultante: modelos/yolov8_military.pt
 ```
 
 ---
 
 ## 🔐 Seguridad
 
-- ✅ **Sin credenciales en código** — todo vía variables de entorno
-- ✅ **Clave Fernet auto-generada** en `base_de_datos/.fernet_key` (chmod 600)
-- ✅ **Alertas cifradas** en tránsito (STARTTLS SMTP, HTTPS Telegram)
-- ✅ `.gitignore` excluye `.env`, `*.db`, imágenes, modelos y logs
+- ✅ **Cero credenciales en código** — todo via `.env`
+- ✅ **Cifrado Fernet AES-128** en BD e imágenes (clave auto-generada, chmod 600)
+- ✅ **Rate limiting API** — 60 req/min por IP, headers `X-RateLimit-*`
+- ✅ **Path traversal protection** en descarga de PDFs
+- ✅ **STARTTLS** en alertas email
+- ✅ `.gitignore` excluye `.env`, BD, modelos, imágenes, PDFs
 
-> ⚠️ **SÓLO PARA USO AUTORIZADO** — Agencias gubernamentales, inteligencia militar y contratistas de defensa debidamente autorizados. Prohibido uso para vigilancia no autorizada.
+> ⚠️ **USO EXCLUSIVAMENTE AUTORIZADO** — Agencias gubernamentales y contratistas de defensa habilitados. Prohibido el uso para vigilancia no autorizada.
 
 ---
 
 ## 💰 Apoya el Proyecto
 
-```text
+```
 ₿ Bitcoin: bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw
 ```
 
----
-
-## 🎖️ CONTACTO OFICIAL
-
-**Autor:** murdok1982 (Gustavo Lobato Clara) · gustavolobatoclara@gmail.com
-
-<details>
-<summary><b>🚨 Reportar incidencia operativa</b></summary>
-Asunto: [QUEJA] Sistema - Descripción · Incluir: incidencia, impacto, evidencia
-</details>
-<details>
-<summary><b>🛠️ Reporte de instalación / despliegue</b></summary>
-Asunto: [COMPILACIÓN] Falla en &lt;entorno&gt; · Incluir: OS, versiones, log completo
-</details>
-<details>
-<summary><b>💡 Propuestas de mejora</b></summary>
-Asunto: [PROPUESTA] Módulo/Mejora · Incluir: objetivo táctico, viabilidad técnica
-</details>
-
----
+**Autor:** murdok1982 — gustavolobatoclara@gmail.com
 
 > *"Si vis pacem, para bellum."*
