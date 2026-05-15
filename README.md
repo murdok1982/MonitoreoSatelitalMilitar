@@ -1,244 +1,235 @@
 <div align="center">
 
 # 🦅 AEGIS-IMINT: Monitoreo Satelital Militar
-### *Inteligencia Estratégica y Seguridad de Vanguardia*
+### *Inteligencia Estratégica y Seguridad de Vanguardia — v2.0*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![AI Powered](https://img.shields.io/badge/AI-YOLOv8-purple.svg)](https://github.com/ultralytics/ultralytics)
-[![Computer Vision](https://img.shields.io/badge/CV-Sentinel_Hub-green.svg)](https://www.sentinel-hub.com/)
-[![Status: Active](https://img.shields.io/badge/Status-Active-success.svg)](#)
+[![YOLOv8](https://img.shields.io/badge/AI-YOLOv8-purple.svg)](https://github.com/ultralytics/ultralytics)
+[![Ollama](https://img.shields.io/badge/LLM-Ollama%20Local-green.svg)](https://ollama.ai)
+[![Sentinel-2](https://img.shields.io/badge/SAT-Sentinel--2%20L1C-blue.svg)](https://www.sentinel-hub.com/)
+[![Docker](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED.svg)](https://docs.docker.com/compose/)
 
-> **"Vigilancia incesante, respuesta inmediata."**
-> Sistema avanzado de análisis de imágenes satelitales impulsado por Inteligencia Artificial para la detección de vehículos militares, evaluación de amenazas y alerta temprana. Utiliza visión por computadora y aprendizaje automático para identificar y rastrear activos militares.
-
-<br/>
-
-![Military Header](https://upload.wikimedia.org/wikipedia/commons/e/e8/Defense_Support_Program_Satellite.jpg)
+> **"Vigilancia incesante, respuesta inmediata."**  
+> Sistema de análisis de imágenes satelitales impulsado por IA para la detección de vehículos militares, evaluación de amenazas y alerta temprana.
 
 </div>
 
 ---
 
-## 🪖 Características Principales
+## 🪖 Características
 
-- 📡 **Análisis de Imágenes Satelitales**: Procesamiento en tiempo real (Sentinel-2 L1C).
-- 🎯 **Detección Táctica**: Identificación de vehículos militares mediante redes neuronales (YOLOv8).
-- 🗺️ **Rastreo Geoespacial**: Visualización en mapas interactivos (Folium/Streamlit).
-- 🚨 **Sistema de Alerta Temprana**: Notificaciones automatizadas vía SMTP en caso de incursiones.
-- 💾 **Registro Histórico**: Almacenamiento seguro en SQLite para análisis forense y reconocimiento de patrones.
-- 🔐 **Arquitectura Segura**: Cifrado de base de datos y comunicaciones.
-
----
-
-## 🧠 Mapa Conceptual del Sistema
-
-```mermaid
-graph LR
-    A((AEGIS-IMINT))
-    A --> B[Adquisición de Datos]
-    B --> B1(Sentinel Hub)
-    B --> B2(Imágenes Multiespectrales)
-    B --> B3(Coordenadas WGS84)
-
-    A --> C[Motor de IA]
-    C --> C1(YOLOv8 Custom)
-    C --> C2(Ollama LLM)
-    C --> C3(Visión por Computadora)
-
-    A --> D[Interfaz de Mando]
-    D --> D1(Streamlit Dashboard)
-    D --> D2(Folium Maps)
-    D --> D3(Zonas Tácticas)
-
-    A --> E[Respuesta y Alerta]
-    E --> E1(Notificaciones SMTP)
-    E --> E2(Umbral de Sensibilidad)
-    E --> E3(SQLite Cifrado)
-```
+- 📡 **Imágenes Sentinel-2 L1C** con selección automática de menor nubosidad
+- 🎯 **Detección YOLOv8** con filtrado de clases militares (vehículos, aeronaves, navíos)
+- 🧠 **Análisis IMINT con Ollama** (llava:7b) — Informes PMESII-PT en español, clasificación NATO
+- 🚨 **Alertas duales** — Email HTML cifrado + Telegram Bot
+- 🔐 **Cifrado Fernet** — Clave auto-generada, imágenes y base de datos protegidos
+- 🗺️ **Dashboard Streamlit** — Mapa interactivo, historial, gestión de zonas
+- 🐳 **Docker Compose** — Despliegue con Ollama sidecar (GPU si disponible)
 
 ---
 
-## ⚙️ Arquitectura del Sistema
+## 🧠 Arquitectura del Sistema
 
 ```mermaid
 graph TD
-    A[Operador] -->|Define Zona| B(Interfaz Web)
-    B -->|Coordenadas| C{Backend Python}
-    C -->|API Request| D[Sentinel Hub]
-    D -->|Imágenes Satelitales| C
-    C -->|Inferencia| E[Modelo YOLOv8]
-    E -->|Detecciones| C
-    C -->|Almacenamiento| F[(SQLite DB Cifrada)]
-    C -->|Evaluación| G{¿Amenaza Detectada?}
-    G -->|Sí| H[Servidor SMTP]
-    H -->|Email de Alerta| I[Comandancia]
-    G -->|No| B
+    A[Operador] -->|Define Polígono| B(Dashboard Streamlit)
+    B -->|BBox WGS84| C{AEGIS Backend}
+    C -->|OAuth2| D[Sentinel Hub API]
+    D -->|Imagen PNG| C
+    C -->|Inferencia conf≥0.45| E[YOLOv8 Military]
+    E -->|count + clases| C
+    C -->|Prompt PMESII-PT| F[Ollama llava:7b]
+    F -->|Informe IMINT| C
+    C -->|AES-128-CBC| G[(SQLite Cifrado)]
+    C -->|Amenaza ≥ umbral| H{Alertas}
+    H -->|HTML Email| I[SMTP]
+    H -->|Markdown| J[Telegram Bot]
+    I & J --> K[Comandancia]
+    C -->|Actualiza| B
 ```
-
----
-
-## 🔄 Flujo de Operación (Diagrama de Secuencia)
 
 ```mermaid
 sequenceDiagram
-    participant O as Operador
-    participant UI as Interfaz Web
-    participant Core as AEGIS Backend
+    participant Op as Operador
+    participant UI as Streamlit UI
+    participant Core as AEGIS Core
     participant SH as Sentinel Hub
-    participant AI as Motor IA
-    participant DB as SQLite
-    participant Mail as Servidor Correo
+    participant YOLO as YOLOv8
+    participant LLM as Ollama LLM
+    participant DB as SQLite Fernet
 
-    O->>UI: Dibuja Polígono
-    UI->>Core: Inicia Monitoreo
-    loop Intervalo de Actualización
-        Core->>SH: Solicita Imágenes
-        SH-->>Core: Retorna Imágenes
-        Core->>AI: Detecta Vehículos
-        AI-->>Core: Conteo y Tipología
-        Core->>DB: Guarda Registro
-        alt Amenaza Detectada
-            Core->>Mail: Dispara Alerta
-            Mail-->>O: Notificación Urgente
-        end
-        Core->>UI: Actualiza Mapa
+    Op->>UI: Dibuja polígono + pulsa Analizar
+    UI->>Core: bbox coords
+    Core->>SH: GET imagen (últimas 72h, min nubosidad)
+    SH-->>Core: PNG multibanda
+    Core->>YOLO: predict(conf=0.45)
+    YOLO-->>Core: [(clase, confianza, bbox)]
+    Core->>LLM: Prompt PMESII-PT + imagen base64
+    LLM-->>Core: Informe IMINT NATO
+    Core->>DB: INSERT cifrado (Fernet)
+    alt Vehículos ≥ umbral
+        Core->>Core: enviar_alertas()
     end
+    Core-->>UI: Resultados + imagen anotada
 ```
 
 ---
 
-## 🚀 Instalación y Despliegue
+## ⚙️ Instalación
 
-### Requisitos Previos
-
+### Requisitos
 - Python 3.10+
-- Node.js 18+ (Para el frontend avanzado)
-- Cuenta en [Sentinel Hub](https://www.sentinel-hub.com/)
-- [Ollama](https://ollama.ai) instalado localmente (Opcional para análisis heurístico)
+- Cuenta [Sentinel Hub](https://www.sentinel-hub.com/) (gratis para uso limitado)
+- [Ollama](https://ollama.ai) instalado localmente (opcional, para análisis LLM)
 
-### Pasos de Configuración
+### Setup automático
 
-1. **Clonar el repositorio y ejecutar el setup automatizado**:
-   ```cmd
-   git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar.git
-   cd MonitoreoSatelitalMilitar
-   setup.bat
-   ```
-2. **Configurar credenciales**:
-   El script `setup.bat` generará automáticamente un archivo `.env` con claves criptográficas. Debes editarlo y proporcionar:
-   - `SENTINEL_CLIENT_ID` y `SENTINEL_CLIENT_SECRET`
-   - Credenciales SMTP para las alertas.
-3. **Descargar modelos de IA**:
-   Coloca tus modelos pre-entrenados (ej. `yolov8_military.pt`) en el directorio `/modelos`.
-4. **Iniciar el sistema**:
-   - Backend: `start_backend.bat`
-   - Frontend: `start_frontend.bat`
+**Linux / macOS:**
+```bash
+git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
+cd MonitoreoSatelitalMilitar
+bash setup.sh
+# Edita .env con tus credenciales
+bash start.sh
+```
+
+**Windows:**
+```bat
+git clone https://github.com/murdok1982/MonitoreoSatelitalMilitar
+cd MonitoreoSatelitalMilitar
+setup.bat
+# Edita .env con tus credenciales
+start.bat
+```
+
+**Docker:**
+```bash
+cp .env.example .env
+# Edita .env
+docker compose up -d
+# Dashboard en http://localhost:8501
+```
+
+### Configuración `.env`
+
+```env
+# Sentinel Hub (requerido)
+SENTINEL_CLIENT_ID=tu_client_id
+SENTINEL_CLIENT_SECRET=tu_client_secret
+
+# Modelo YOLO (ver /modelos/README.md)
+YOLO_MODEL_PATH=modelos/yolov8_military.pt
+CONFIDENCE_THRESHOLD=0.45
+
+# Ollama (opcional - análisis IMINT)
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llava:7b
+
+# Alertas Email
+EMAIL_FROM=tu@gmail.com
+EMAIL_PASSWORD=tu_app_password
+EMAIL_TO=comandante@ejemplo.com
+
+# Alertas Telegram (alternativa)
+TELEGRAM_BOT_TOKEN=tu_bot_token
+TELEGRAM_CHAT_ID=tu_chat_id
+
+# Sensibilidad
+SENSIBILIDAD_ALERTA=5
+```
 
 ---
 
-## 💰 Apoya este Proyecto (Support)
+## 🤖 Modelo YOLO
 
-<div align="center">
+Ver `/modelos/README.md` para instrucciones detalladas de descarga.
 
-### ₿ Donaciones en Bitcoin
+Datasets recomendados para entrenamiento:
 
-El desarrollo de sistemas de defensa y seguridad requiere recursos constantes. Tu apoyo es fundamental.
+| Dataset | Contenido | URL |
+|---|---|---|
+| xView | Vehículos, aeronaves, navíos satelitales | [xviewdataset.org](http://xviewdataset.org/) |
+| DOTA | Objetos aéreos multi-clase (15 categorías) | [captain-whu.github.io/DOTA](https://captain-whu.github.io/DOTA/) |
+| VEDAI | 3000 imágenes aéreas de vehículos | [VEDAI](https://downloads.greyc.fr/vedai/) |
+| Military Aircraft | Aeronaves militares desde arriba | HuggingFace |
 
-<img src="https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white" alt="Bitcoin"/>
+---
+
+## 🗺️ Modos de Operación
+
+| Modo | Función |
+|---|---|
+| **Monitoreo en Vivo** | Dibuja zona, descarga imagen Sentinel-2, detecta y genera informe IMINT |
+| **Historial / Análisis** | Gráfico de tendencias, tabla de detecciones con informes LLM |
+| **Zonas Guardadas** | Gestiona zonas predefinidas de vigilancia permanente |
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+MonitoreoSatelitalMilitar/
+├── main.py                    # Aplicación Streamlit principal
+├── config.py                  # Configuración desde .env
+├── requirements.txt           # Dependencias pip
+├── .env.example               # Plantilla de configuración
+├── setup.sh / setup.bat       # Instalación automática
+├── start.sh / start.bat       # Arranque rápido
+├── Dockerfile                 # Imagen Docker
+├── docker-compose.yml         # Stack completo con Ollama
+├── utils/
+│   ├── sentinel.py            # Descarga Sentinel-2 (fecha dinámica)
+│   ├── detector.py            # YOLOv8 con filtrado militar
+│   ├── ollama_analyst.py      # Análisis IMINT PMESII-PT
+│   ├── alerts.py              # Email HTML + Telegram
+│   ├── database.py            # SQLite thread-safe + zonas
+│   └── crypto.py              # Cifrado Fernet
+├── modelos/
+│   └── README.md              # Instrucciones descarga de modelos
+├── base_de_datos/             # SQLite (auto-creado)
+├── imagenes/                  # Imágenes satelitales (auto-creado)
+└── logs/                      # Logs de operación
+```
+
+---
+
+## 🔐 Seguridad
+
+- ✅ **Sin credenciales en código** — todo vía variables de entorno
+- ✅ **Clave Fernet auto-generada** en `base_de_datos/.fernet_key` (chmod 600)
+- ✅ **Alertas cifradas** en tránsito (STARTTLS SMTP, HTTPS Telegram)
+- ✅ `.gitignore` excluye `.env`, `*.db`, imágenes, modelos y logs
+
+> ⚠️ **SÓLO PARA USO AUTORIZADO** — Agencias gubernamentales, inteligencia militar y contratistas de defensa debidamente autorizados. Prohibido uso para vigilancia no autorizada.
+
+---
+
+## 💰 Apoya el Proyecto
 
 ```text
-┌─────────────────────────────────────┐
-│    ₿  BTC Donation Address  ₿      │
-├─────────────────────────────────────┤
-│                                     │
-│  bc1qqphwht25vjzlptwzjyjt3sex     │
-│  7e3p8twn390fkw                    │
-│                                     │
-│  Network: Bitcoin (BTC)             │
-│  Scan QR ↓                          │
-└─────────────────────────────────────┘
+₿ Bitcoin: bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw
 ```
 
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bitcoin:bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw" alt="Bitcoin QR Code" width="200"/>
-
-**Address:** `bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw`
-
-*¡Tus donaciones ayudan a mantener operativa esta tecnología estratégica!* 🙏
-
-</div>
-
 ---
 
-## 🛡️ Seguridad y Consideraciones Éticas
+## 🎖️ CONTACTO OFICIAL
 
-### Medidas Implementadas
-- ✅ Bases de datos y archivos de imagen cifrados mediante Fernet (claves autogeneradas).
-- ✅ Credenciales inyectadas por variables de entorno (`.env`), nunca en código fuente.
-- ✅ Autenticación JWT en el panel de control.
-
-### Descargo de Responsabilidad (Disclaimer)
-⚠️ **SÓLO PARA USO AUTORIZADO** ⚠️
-Este software está diseñado para agencias gubernamentales, inteligencia militar, y contratistas de defensa debidamente autorizados.
-El uso para espionaje comercial, vigilancia no autorizada o violación de derechos de privacidad está estrictamente prohibido y penado por la ley.
-
----
-
-## 👤 Autor e Información de Contacto
-
-**Arquitecto de Inteligencia Artificial:** murdok1982 (Gustavo Lobato Clara)
-
-- 🐙 GitHub: [@murdok1982](https://github.com/murdok1982)
-- 💼 LinkedIn: [Gustavo Lobato Clara](https://www.linkedin.com/in/gustavo-lobato-clara-2b446b102/)
-- 📧 Email: gustavolobatoclara@gmail.com
-
----
-
-> *"Si vis pacem, para bellum."* — Si quieres la paz, prepárate para la guerra.
-
-<div align="center">
-  <br>
-  ⭐ <b>Si consideras este sistema útil para tus operaciones, no olvides darle una estrella en GitHub.</b>
-</div>
----
-
-## 🎖️ CENTRO DE COMUNICACIONES Y REPORTES OFICIALES
-**NIVEL DE ACCESO:** AUTORIZADO | **DESTINATARIO:** COMANDANCIA DE DESARROLLO (gustavolobatoclara@gmail.com)
-
-A través del siguiente portal de comunicaciones, el personal autorizado puede emitir reportes de incidencias, fallas críticas en despliegue (compilación) o solicitudes de mejoras estratégicas. Seleccione la directiva correspondiente para visualizar los protocolos de envío:
+**Autor:** murdok1982 (Gustavo Lobato Clara) · gustavolobatoclara@gmail.com
 
 <details>
-<summary><b>🚨 REPORTAR QUEJA O INCIDENCIA DISCIPLINARIA / OPERATIVA</b></summary>
-<br>
-Para tramitar una queja sobre el funcionamiento, estructura o contenido del sistema, envíe un mensaje a <b>gustavolobatoclara@gmail.com</b> siguiendo este protocolo:
-<ol>
-  <li><b>Asunto:</b> [QUEJA] - Nombre del Sistema - Breve descripción.</li>
-  <li><b>Cuerpo del mensaje:</b> Detallar claramente la incidencia, impacto operativo y, si es posible, la evidencia (capturas o logs).</li>
-  <li><b>Prioridad:</b> Indicar si es de atención inmediata o diferida.</li>
-</ol>
+<summary><b>🚨 Reportar incidencia operativa</b></summary>
+Asunto: [QUEJA] Sistema - Descripción · Incluir: incidencia, impacto, evidencia
 </details>
-
 <details>
-<summary><b>🛠️ REPORTE DE PROBLEMAS DE COMPILACIÓN O DESPLIEGUE</b></summary>
-<br>
-Si experimenta fallos durante la fase de compilación o instalación del sistema, reporte a <b>gustavolobatoclara@gmail.com</b> con la siguiente estructura técnica:
-<ol>
-  <li><b>Asunto:</b> [COMPILACIÓN] - Falla en entorno &lt;Entorno/OS&gt;.</li>
-  <li><b>Especificaciones:</b> Sistema Operativo, versión de dependencias y herramientas de compilación utilizadas.</li>
-  <li><b>Traza de Error (Logs):</b> Adjunte el log completo de errores proporcionado por la terminal (en formato texto o captura legible).</li>
-  <li><b>Pasos de Reproducción:</b> Secuencia exacta de comandos ejecutados antes del fallo crítico.</li>
-</ol>
+<summary><b>🛠️ Reporte de instalación / despliegue</b></summary>
+Asunto: [COMPILACIÓN] Falla en &lt;entorno&gt; · Incluir: OS, versiones, log completo
 </details>
-
 <details>
-<summary><b>💡 SUGERENCIAS O SOLICITUDES DE DESARROLLO</b></summary>
-<br>
-Para proponer nuevas capacidades tácticas, módulos de inteligencia o mejoras de arquitectura, envíe su solicitud a <b>gustavolobatoclara@gmail.com</b>:
-<ol>
-  <li><b>Asunto:</b> [PROPUESTA] - Mejora o Nuevo Módulo.</li>
-  <li><b>Objetivo Táctico:</b> ¿Qué problema resuelve o qué ventaja proporciona esta nueva característica?</li>
-  <li><b>Viabilidad:</b> (Opcional) Posible enfoque técnico o herramientas recomendadas para su implementación.</li>
-</ol>
+<summary><b>💡 Propuestas de mejora</b></summary>
+Asunto: [PROPUESTA] Módulo/Mejora · Incluir: objetivo táctico, viabilidad técnica
 </details>
 
 ---
+
+> *"Si vis pacem, para bellum."*
