@@ -40,6 +40,6 @@ SENSIBILIDAD_ALERTA = int(os.getenv('SENSIBILIDAD_ALERTA', '5'))
 MAX_IMAGE_AGE_DAYS = int(os.getenv('MAX_IMAGE_AGE_DAYS', '3'))
 
 # ─── Almacenamiento y seguridad ────────────────────────────────────────────────
-DB_PATH = os.getenv('DB_PATH', 'base_de_datos/detecciones.db')
-IMAGES_DIR = os.getenv('IMAGES_DIR', 'imagenes')
-FERNET_KEY_PATH = os.getenv('FERNET_KEY_PATH', 'base_de_datos/.fernet_key')
+DB_PATH = os.getenv('DB_PATH', os.path.join(os.path.dirname(__file__), 'base_de_datos', 'detecciones.db'))
+IMAGES_DIR = os.getenv('IMAGES_DIR', os.path.join(os.path.dirname(__file__), 'imagenes'))
+FERNET_KEY_PATH = os.getenv('FERNET_KEY_PATH', os.path.join(os.path.dirname(__file__), 'base_de_datos', '.fernet_key'))
