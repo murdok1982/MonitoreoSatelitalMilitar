@@ -80,7 +80,7 @@ except ImportError:
         def analyze(self, bbox, vehicles=0): return _GdeltResult()
 
 # --- Auth ---
-API_KEY = os.getenv('AEGIS_API_KEY', 'aegis-dev-key-change-in-production')
+API_KEY = os.environ['AEGIS_API_KEY']
 api_key_header = APIKeyHeader(name='X-API-Key', auto_error=True)
 
 
