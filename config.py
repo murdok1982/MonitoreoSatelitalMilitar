@@ -1,3 +1,4 @@
+import os
 """
 AEGIS-IMINT — Configuración central
 Carga todos los parámetros desde variables de entorno / archivo .env
@@ -6,7 +7,7 @@ NUNCA incluir credenciales directamente en este archivo.
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 # ─── Sentinel Hub ──────────────────────────────────────────────────────────────
 INSTANCE_ID = os.getenv('SENTINEL_INSTANCE_ID', '')
