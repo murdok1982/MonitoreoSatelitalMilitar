@@ -25,59 +25,18 @@ from api.middleware import RateLimitMiddleware
 # definitions, route registration) always succeeds.  The stubs are replaced by
 # the real implementations if the modules are present on sys.path.
 # ---------------------------------------------------------------------------
-try:
-    from config import DB_PATH, SENSIBILIDAD_ALERTA, OLLAMA_BASE_URL, OLLAMA_MODEL  # type: ignore
-except ImportError:
-    DB_PATH = os.getenv("AEGIS_DB_PATH", "aegis.db")
-    SENSIBILIDAD_ALERTA = int(os.getenv("SENSIBILIDAD_ALERTA", "5"))
-    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+from config import DB_PATH, SENSIBILIDAD_ALERTA, OLLAMA_BASE_URL, OLLAMA_MODEL  # type: ignore
 
-try:
-    from utils.database import (  # type: ignore
-        init_db, guardar_deteccion, obtener_historial,
-        obtener_tendencia, guardar_zona, obtener_zonas,
-    )
-except ImportError:
-    def init_db(): pass  # type: ignore
-    def guardar_deteccion(*a, **kw): pass  # type: ignore
-    def obtener_historial(limit=50): return []  # type: ignore
-    def obtener_tendencia(*a): return []  # type: ignore
-    def guardar_zona(*a): pass  # type: ignore
-    def obtener_zonas(): return []  # type: ignore
+from utils.database import (  # type: ignore
+    init_db, guardar_deteccion, obtener_historial,
+    obtener_tendencia, guardar_zona, obtener_zonas,
+)
 
-try:
-    from utils.ollama_analyst import OllamaAnalyst  # type: ignore
-except ImportError:
-    class OllamaAnalyst:  # type: ignore
-        def __init__(self, *a, **kw): pass
-        def is_available(self): return False
-        def classify_threat_level(self, count, *a):
-            if count == 0: return {"level": "VERDE", "action": "Monitor"}
-            if count < 5:  return {"level": "AMARILLO", "action": "Heightened watch"}
-            if count < 10: return {"level": "NARANJA", "action": "Alert command"}
-            return {"level": "ROJO", "action": "Immediate response"}
-        def analyze_detection(self, *a, **kw): return ""
+from utils.ollama_analyst import OllamaAnalyst  # type: ignore""
 
-try:
-    from utils.temporal_analysis import TemporalAnalyzer  # type: ignore
-except ImportError:
-    class TemporalAnalyzer:  # type: ignore
-        def __init__(self, *a, **kw): pass
-        def analyze(self, *a, **kw): return None
+from utils.temporal_analysis import TemporalAnalyzer  # type: ignore
 
-try:
-    from utils.gdelt import GdeltCrossReference  # type: ignore
-except ImportError:
-    class _GdeltResult:
-        military_events = 0
-        conflict_score = 0.0
-        threat_correlation = "NONE"
-        summary = "GDELT module not available."
-        events = []
-
-    class GdeltCrossReference:  # type: ignore
-        def analyze(self, bbox, vehicles=0): return _GdeltResult()
+from utils.gdelt import GdeltCrossReference  # type: ignore
 
 # --- Auth ---
 API_KEY = os.environ['AEGIS_API_KEY']
@@ -266,7 +225,8 @@ def analyze_zone(
             results = enviar_alertas(vehicle_count, bbox, llm_report)
             alert_sent = any(results.values())
         except ImportError:
-            pass
+            import logging
+            logging.getLogger("aegis.api").warning("utils.alerts no disponible, alertas omitidas")
 
     # Optional async PDF generation
     if req.generate_report:
