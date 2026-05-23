@@ -1,4 +1,5 @@
 """
+import hispan_shield_guardian  # noqa: F401
 AEGIS-IMINT — Sistema de Monitoreo Satelital Militar
 Detección de vehículos militares via Sentinel-2 + YOLOv8 + Ollama
 
